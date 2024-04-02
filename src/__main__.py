@@ -20,13 +20,17 @@ def main() -> None:
 
 async def loop(client: telethon.TelegramClient) -> None:
     logger.info("Starting loop")
+    db = Database()
     while True:
-        links, delayed_messages = await extract_data(client)
+        if len(db.data["all_links"]) == 0:
+            logger.info("DB is empty, initializing it")
+            links, delayed_messages = await extract_data(client)
 
-        print(links)
-        print(delayed_messages)
-
-        break
+            for link in links:
+                db.add_link(link)
+            for to, messages in delayed_messages.items():
+                for msg in messages:
+                    db.add_delayed_message(msg, to=to)
 
 
 if __name__ == "__main__":
