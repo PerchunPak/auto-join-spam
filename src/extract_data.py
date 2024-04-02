@@ -15,23 +15,31 @@ async def extract_data(
         async for message in client.iter_messages(dialog):
             logger.info(f"{dialog.name}")
 
-            if message.entities is not None:
-                links.update(
-                    extract_links_from_entities(message.text, message.entities)
-                )
-
-            if message.reply_markup is not None:
-                messages_to_add, links_to_add = extract_links_from_reply_markup(
-                    message.reply_markup
-                )
-
-                links.update(links_to_add)
-                messages_to_send.update(messages_to_add)
+            links_to_add, messages_to_add = await extract_message(message)
+            links.update(links_to_add)
+            messages_to_send.update(messages_to_add)
 
         delayed_messages.setdefault(dialog.id, set())
         delayed_messages[dialog.id].update(messages_to_send)
 
     return links, delayed_messages
+
+
+async def extract_message(message: telethon.types.Message) -> tuple[set[str], set[str]]:
+    links: set[str] = set()
+    messages_to_send: set[str] = set()
+    if message.entities is not None:
+        links.update(extract_links_from_entities(message.message, message.entities))
+
+    if message.reply_markup is not None:
+        messages_to_add, links_to_add = extract_links_from_reply_markup(
+            message.reply_markup
+        )
+
+        links.update(links_to_add)
+        messages_to_send.update(messages_to_add)
+
+    return links, messages_to_send
 
 
 def extract_links_from_entities(
@@ -58,12 +66,21 @@ def extract_links_from_entities(
 
 
 def extract_links_from_reply_markup(
-    reply_markup: telethon.tl.types.ReplyInlineMarkup,
+    reply_markup: telethon.tl.types.TypeReplyMarkup,
 ) -> tuple[set[str], set[str]]:
     """
     Returns:
         Two sets: messages to send and links.
     """
+    # no `.rows`
+    assert not isinstance(
+        reply_markup,
+        (
+            telethon.tl.types.ReplyKeyboardForceReply,
+            telethon.tl.types.ReplyKeyboardHide,
+        ),
+    )
+
     messages_to_add: set[str] = set()
     links_to_add: set[str] = set()
 

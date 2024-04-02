@@ -7,6 +7,7 @@ from src import utils
 from src.config import Config
 from src.db import Database
 from src.extract_data import extract_data
+from src import on_message
 
 
 def main() -> None:
@@ -17,6 +18,7 @@ def main() -> None:
     Database()
     logger.info("Starting app...")
     with telethon.TelegramClient("data/bot", config.api_id, config.api_hash) as client:
+        on_message.register(client)
         client.loop.run_until_complete(loop(client))
 
 
