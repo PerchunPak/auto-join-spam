@@ -7,7 +7,7 @@ build-backend = "poetry.core.masonry.api"
 name = "auto-join-spam"
 description = "Automatically join links sent by spam bots."
 version = "0.1.0"
-license = "AGPL3"
+license = "GLWTS"
 authors = []
 readme = "README.md"
 packages = [ { include = "src" } ]
