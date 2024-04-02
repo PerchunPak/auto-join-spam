@@ -1,3 +1,5 @@
+import asyncio
+
 import telethon.tl.types
 from loguru import logger
 
@@ -31,6 +33,8 @@ async def loop(client: telethon.TelegramClient) -> None:
             for to, messages in delayed_messages.items():
                 for msg in messages:
                     db.add_delayed_message(msg, to=to)
+
+        await asyncio.sleep(10)
 
 
 if __name__ == "__main__":
