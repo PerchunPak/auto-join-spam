@@ -10,25 +10,6 @@ import typing_extensions as te
 from src import utils
 
 
-@dataclasses.dataclass
-class ApykumaConfigSection:
-    """Sentry config section."""
-
-    enabled: bool = False
-    url: str = "..."
-    interval: int = 60
-    delay: int = 0
-
-
-@dataclasses.dataclass
-class SentryConfigSection:
-    """Sentry config section."""
-
-    enabled: bool = False
-    dsn: str = "..."
-    traces_sample_rate: float = 1.0
-
-
 class LoggingLevel(enum.IntEnum):
     TRACE = 5
     """Use only for tracing error without a debugger."""
