@@ -1,4 +1,5 @@
 """File for the main config."""
+
 import dataclasses
 import enum
 import typing as t
@@ -49,6 +50,8 @@ class LoggingSection:
 class Config(metaclass=utils.Singleton):
     """The main config that holds everything in itself."""
 
+    api_id: int = "..."  # type: ignore
+    api_hash: str = "..."
     logging: LoggingSection = dataclasses.field(default_factory=LoggingSection)
 
     @classmethod
