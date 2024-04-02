@@ -1,10 +1,10 @@
 import telethon.tl.types
-
 from loguru import logger
 
 from src import utils
-from src.extract_data import extract_data
 from src.config import Config
+from src.db import Database
+from src.extract_data import extract_data
 
 
 def main() -> None:
@@ -12,6 +12,7 @@ def main() -> None:
     logger.info("Hello World!")
 
     config = Config()
+    Database()
     logger.info("Starting app...")
     with telethon.TelegramClient("data/bot", config.api_id, config.api_hash) as client:
         client.loop.run_until_complete(loop(client))
