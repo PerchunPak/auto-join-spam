@@ -31,7 +31,7 @@ class LoggingSection:
 class Config(metaclass=utils.Singleton):
     """The main config that holds everything in itself."""
 
-    api_id: int = "..."  # type: ignore
+    api_id: int = -1
     api_hash: str = "..."
     logging: LoggingSection = dataclasses.field(default_factory=LoggingSection)
 
