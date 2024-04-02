@@ -28,11 +28,9 @@ async def loop(client: telethon.TelegramClient) -> None:
             logger.info("DB is empty, initializing it")
             links, delayed_messages = await extract_data(client)
 
-            for link in links:
-                db.add_link(link)
+            db.add_links(links)
             for to, messages in delayed_messages.items():
-                for msg in messages:
-                    db.add_delayed_message(msg, to=to)
+                db.add_delayed_messages(messages, to=to)
 
         await asyncio.sleep(10)
 

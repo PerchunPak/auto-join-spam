@@ -61,12 +61,12 @@ class Database(metaclass=utils.Singleton):
         with self.DATABASE_PATH.open("w") as f:
             json.dump(self._unsanitize_json(self.data), f, indent=2, ensure_ascii=False)
 
-    def add_link(self, link: str) -> None:
-        self.data["all_links"].add(link)
-        self.data["links"].add(link)
+    def add_links(self, link: set[str]) -> None:
+        self.data["all_links"].update(link)
+        self.data["links"].update(link)
         self.save()
 
-    def add_delayed_message(self, msg: str, *, to: int) -> None:
+    def add_delayed_messages(self, msg: set[str], *, to: int) -> None:
         self.data["delayed_messages"].setdefault(to, set())
-        self.data["delayed_messages"][to].add(msg)
+        self.data["delayed_messages"][to].update(msg)
         self.save()
