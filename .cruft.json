@@ -1,0 +1,21 @@
+{
+  "template": "/home/perchun/dev/python-template",
+  "commit": "25afc0824147df8bb1168d209d41de42efb58b98",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "auto-join-spam",
+      "organization": "PerchunPak",
+      "project_description": "Automatically join links sent by spam bots.",
+      "other_languages_support": "n",
+      "ukrainian_language_support": "n",
+      "russian_language_support": "n",
+      "license": "AGPL3",
+      "_copy_without_render": [
+        "docs/_autoapi_templates/python"
+      ],
+      "_template": "/home/perchun/dev/python-template"
+    }
+  },
+  "directory": null
+}
