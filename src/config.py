@@ -1,7 +1,6 @@
 """File for the main config."""
 import dataclasses
 import enum
-import pathlib
 import typing as t
 
 import omegaconf
@@ -50,8 +49,6 @@ class LoggingSection:
 class Config(metaclass=utils.Singleton):
     """The main config that holds everything in itself."""
 
-    apykuma: ApykumaConfigSection = dataclasses.field(default_factory=ApykumaConfigSection)
-    sentry: SentryConfigSection = dataclasses.field(default_factory=SentryConfigSection)
     logging: LoggingSection = dataclasses.field(default_factory=LoggingSection)
 
     @classmethod
