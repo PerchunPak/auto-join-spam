@@ -3,11 +3,10 @@ import asyncio
 import telethon.tl.types
 from loguru import logger
 
-from src import utils
+from src import on_message, utils, process
 from src.config import Config
 from src.db import Database
 from src.extract_data import extract_data
-from src import on_message
 
 
 def main() -> None:
@@ -34,7 +33,14 @@ async def loop(client: telethon.TelegramClient) -> None:
             for to, messages in delayed_messages.items():
                 db.add_delayed_messages(messages, to=to)
 
-        await asyncio.sleep(10)
+        try:
+            await process.join_all_links(client, db.data["links"])
+        except process.RateLimitError:
+            pass
+        else:
+            await process.send_delayed_messages(db.data["delayed_messages"])
+
+        await asyncio.sleep(600)
 
 
 if __name__ == "__main__":
