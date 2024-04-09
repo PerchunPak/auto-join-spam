@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import telethon.tl.types
 from loguru import logger
+from rich.progress import track
 
 from src import on_message, utils, process
 from src.config import Config
@@ -37,10 +38,11 @@ async def loop(client: telethon.TelegramClient) -> None:
         try:
             await process.join_all_links(client, db.data["links"])
         except process.RateLimitError as error:
-            logger.warning(
-                f"Got rate limited, sleeping for {timedelta(seconds=error.sleep_for)}!"
-            )
-            await asyncio.sleep(error.sleep_for)
+            for _ in track(
+                range(error.sleep_for),
+                description=f"Got rate limited, sleeping for {timedelta(seconds=error.sleep_for)}...",
+            ):
+                await asyncio.sleep(1)
         else:
             await process.send_delayed_messages(db.data["delayed_messages"])
 
