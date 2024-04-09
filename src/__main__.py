@@ -39,7 +39,9 @@ async def loop(client: telethon.TelegramClient) -> None:
             await process.join_all_links(client, db.data["links"])
         except process.RateLimitError as error:
             for _ in track(
-                range(error.sleep_for),
+                # telegram doesn't like when we get rate-limited multiple times
+                # in a row, so let's try sleeping for 10 times more time than TG says to
+                range(error.sleep_for * 10),
                 description=f"Got rate limited, sleeping for {timedelta(seconds=error.sleep_for)}...",
             ):
                 await asyncio.sleep(1)
