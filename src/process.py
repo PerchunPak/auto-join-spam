@@ -4,12 +4,8 @@ from src.db import Database
 
 
 class RateLimitError(Exception):
-    sleep_for: int
-
-
-def sanitize_link(link: str) -> str:
-    assert link.startswith("https://t.me/+"), link
-    return link.removeprefix("https://t.me/+")
+    def __init__(self, sleep_for: int) -> None:
+        self.sleep_for = sleep_for
 
 
 async def join_all_links(client: telethon.TelegramClient, links: set[str]) -> None:
@@ -22,7 +18,7 @@ async def join_all_links(client: telethon.TelegramClient, links: set[str]) -> No
         try:
             result = await client(
                 telethon.functions.messages.ImportChatInviteRequest(
-                    hash=sanitize_link(link)
+                    hash=link.removeprefix("+")
                 )
             )
 

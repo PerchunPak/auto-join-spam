@@ -1,5 +1,6 @@
 """Module for some useful utils."""
 
+import re
 import os
 import pathlib
 import sys
@@ -29,6 +30,13 @@ class Singleton(type):
             cls._instances[cls] = instance
 
         return cls._instances[cls]
+
+
+def validate_link(link: str) -> bool:
+    result = re.match(r".*(t\.me/)?(\+[\d\w_-]{16})$", link)
+    if result:
+        return result.group(2)
+    return False
 
 
 def setup_logging() -> None:
