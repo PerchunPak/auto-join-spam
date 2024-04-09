@@ -70,3 +70,7 @@ class Database(metaclass=utils.Singleton):
         self.data["delayed_messages"].setdefault(to, set())
         self.data["delayed_messages"][to].update(msg)
         self.save()
+
+    def mark_link_as_joined(self, link: str) -> None:
+        self.data["links"].remove(link)
+        self.save()
