@@ -33,6 +33,10 @@ async def join_all_links(client: telethon.TelegramClient, links: set[str]) -> No
         except telethon.errors.FloodWaitError as error:
             raise RateLimitError(sleep_for=error.seconds)
 
+        except telethon.errors.InviteHashExpiredError:
+            db.mark_link_as_joined(link)
+            logger.warning(f"Apparently, {link} has expired")
+
         else:
             logger.critical(f"Cannot join {link}: {result.stringify()!r}")
 
