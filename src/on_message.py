@@ -21,9 +21,10 @@ async def on_message(event: telethon.events.NewMessage.Event) -> None:
         logger.trace("Got invalid message from {} (not a bot)", sender.username)
         return
 
-    logger.info("New message from: {}", sender.username)
-
     links_to_add, messages_to_add = await extract_message(event.message)
+    logger.info(
+        f"New message from: {sender.username} (links: {len(links_to_add)}; delayed messages: {len(messages_to_add)})"
+    )
 
     db.add_links(links_to_add)
     db.add_delayed_messages(messages_to_add, to=sender.id)
