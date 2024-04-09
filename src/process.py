@@ -1,9 +1,5 @@
-import asyncio
-import random
-
 import telethon
 from loguru import logger
-
 from src.db import Database
 
 
@@ -43,10 +39,6 @@ async def join_all_links(client: telethon.TelegramClient, links: set[str]) -> No
 
         else:
             logger.critical(f"Cannot join {link}: {result.stringify()!r}")
-
-        to_sleep = 10 + random.randint(0, 10)
-        logger.info(f"Sleeping for {to_sleep} seconds before trying other link")
-        await asyncio.sleep(to_sleep)
 
 
 async def send_delayed_messages(delayed_messages: dict[int, set[str]]) -> None:
