@@ -45,8 +45,7 @@ async def loop(client: telethon.TelegramClient) -> None:
                 await asyncio.sleep(1)
         else:
             await process.send_delayed_messages(db.data["delayed_messages"])
-
-        await asyncio.sleep(600)
+            await asyncio.sleep(600)
 
 
 if __name__ == "__main__":
