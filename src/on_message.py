@@ -18,15 +18,16 @@ async def on_message(event: telethon.events.NewMessage.Event) -> None:
         else await event.message.get_sender()
     )
 
-    # if not a user/bot OR if not a channel
-    if (not isinstance(sender, (telethon.tl.types.User)) or not sender.bot) or (
-        not isinstance(sender, telethon.tl.types.Channel)
-    ):
-        logger.trace("Got invalid message from {} (not a bot/channel)", sender)
+    if isinstance(sender, telethon.tl.types.User) and not sender.bot:
+        logger.debug("Got invalid message from {} (not a bot)", sender)
+        return
+
+    elif not isinstance(sender, (telethon.tl.types.User, telethon.tl.types.Channel)):
+        logger.debug("Got invalid message from {} (not a bot/channel)", sender)
         return
 
     links_to_add, messages_to_add = await extract_message(event.message)
-    logger.info(
+    logger.debug(
         f"New message from: {sender.username} (links: {len(links_to_add)}; delayed messages: {len(messages_to_add)})"
     )
 
