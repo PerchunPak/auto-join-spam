@@ -27,8 +27,12 @@ async def on_message(event: telethon.events.NewMessage.Event) -> None:
         return
 
     links_to_add, messages_to_add = await extract_message(event.message)
+
+    displayed_name = (
+        sender.username if isinstance(sender, telethon.tl.types.User) else sender.title
+    )
     logger.debug(
-        f"New message from: {sender.username} (links: {len(links_to_add)}; delayed messages: {len(messages_to_add)})"
+        f"New message from: {displayed_name} (links: {len(links_to_add)}; delayed messages: {len(messages_to_add)})"
     )
 
     db.add_links(links_to_add)
