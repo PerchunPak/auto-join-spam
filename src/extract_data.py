@@ -2,7 +2,7 @@ import telethon.tl.types
 from loguru import logger
 
 
-async def extract_data(
+async def extract_data_from_bots(
     client: telethon.TelegramClient,
 ) -> tuple[set[str], dict[int, set[str]]]:
     links: set[str] = set()
@@ -10,14 +10,39 @@ async def extract_data(
     async for dialog in client.iter_dialogs():
         if not dialog.is_user or not dialog.entity.bot:
             continue
+        logger.debug(f"Extracting links from {dialog.name}...")
 
         messages_to_send: set[str] = set()
         async for message in client.iter_messages(dialog):
-            logger.info(f"{dialog.name}")
-
             links_to_add, messages_to_add = await extract_message(message)
             links.update(links_to_add)
             messages_to_send.update(messages_to_add)
+
+        delayed_messages.setdefault(dialog.id, set())
+        delayed_messages[dialog.id].update(messages_to_send)
+
+    return links, delayed_messages
+
+
+async def extract_data_from_unread_messages(
+    client: telethon.TelegramClient,
+) -> tuple[set[str], dict[int, set[str]]]:
+    links: set[str] = set()
+    delayed_messages: dict[int, set[str]] = {}
+    async for dialog in client.iter_dialogs():
+        if dialog.unread_count == 0:
+            continue
+        logger.info(f"Found unread messages in {dialog.name}")
+
+        messages_to_send: set[str] = set()
+        async for message in client.iter_messages(
+            dialog, limit=dialog.unread_count, reverse=True
+        ):
+            links_to_add, messages_to_add = await extract_message(message)
+            links.update(links_to_add)
+            messages_to_send.update(messages_to_add)
+
+        await client.send_read_acknowledge(dialog)
 
         delayed_messages.setdefault(dialog.id, set())
         delayed_messages[dialog.id].update(messages_to_send)

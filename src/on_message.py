@@ -37,3 +37,5 @@ async def on_message(event: telethon.events.NewMessage.Event) -> None:
 
     db.add_links(links_to_add)
     db.add_delayed_messages(messages_to_add, to=sender.id)
+
+    event.client.send_read_acknowledge(sender, event.message)

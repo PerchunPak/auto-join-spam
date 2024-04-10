@@ -8,7 +8,7 @@ from rich.progress import track
 from src import on_message, utils, process
 from src.config import Config
 from src.db import Database
-from src.extract_data import extract_data
+from src import extract_data
 
 
 def main() -> None:
@@ -26,15 +26,20 @@ def main() -> None:
 async def loop(client: telethon.TelegramClient) -> None:
     logger.info("Starting loop")
     db = Database()
+
+    if len(db.data["all_links"]) == 0:
+        logger.info("DB is empty, initializing it")
+        links, delayed_messages = await extract_data.extract_data_from_bots(client)
+    else:
+        links, delayed_messages = await extract_data.extract_data_from_unread_messages(
+            client
+        )
+
+    db.add_links(links)
+    for to, messages in delayed_messages.items():
+        db.add_delayed_messages(messages, to=to)
+
     while True:
-        if len(db.data["all_links"]) == 0:
-            logger.info("DB is empty, initializing it")
-            links, delayed_messages = await extract_data(client)
-
-            db.add_links(links)
-            for to, messages in delayed_messages.items():
-                db.add_delayed_messages(messages, to=to)
-
         try:
             await process.join_all_links(client, db.data["links"])
         except process.RateLimitError as error:
