@@ -26,6 +26,8 @@ def main() -> None:
 async def loop(client: telethon.TelegramClient) -> None:
     logger.info("Starting loop")
     db = Database()
+    utils.start_sentry()
+    await utils.start_apykuma()
 
     if len(db.data["all_links"]) == 0:
         logger.info("DB is empty, initializing it")
