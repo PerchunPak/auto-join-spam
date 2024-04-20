@@ -4,10 +4,9 @@ from datetime import timedelta
 import telethon.tl.types
 from loguru import logger
 
-from src import on_message, utils, process
+from src import extract_data, on_message, process, utils
 from src.config import Config
 from src.db import Database
-from src import extract_data
 
 
 def main() -> None:
@@ -32,9 +31,7 @@ async def loop(client: telethon.TelegramClient) -> None:
         logger.info("DB is empty, initializing it")
         links, delayed_messages = await extract_data.extract_data_from_bots(client)
     else:
-        links, delayed_messages = await extract_data.extract_data_from_unread_messages(
-            client
-        )
+        links, delayed_messages = await extract_data.extract_data_from_unread_messages(client)
 
     db.add_links(links)
     for to, messages in delayed_messages.items():
@@ -44,13 +41,11 @@ async def loop(client: telethon.TelegramClient) -> None:
         try:
             await process.join_all_links(client, db.data["links"])
         except process.RateLimitError as error:
-            logger.warning(
-                f"Got rate limited for {timedelta(seconds=error.sleep_for)}! Sleeping for next 15 minutes"
-            )
+            logger.warning(f"Got rate limited for {timedelta(seconds=error.sleep_for)}! Sleeping for next 15 minutes")
         else:
             await process.send_delayed_messages(db.data["delayed_messages"])
 
-        await asyncio.sleep(15 * 60 * 60)
+        await asyncio.sleep(15 * 60)
 
 
 if __name__ == "__main__":
