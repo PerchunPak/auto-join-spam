@@ -68,6 +68,9 @@ class Database(metaclass=utils.Singleton):
     def add_links(self, links: set[str]) -> None:
         for link in links:
             if actual_link := utils.validate_link(link):
+                if actual_link in self.data["all_links"]:
+                    continue
+
                 self.data["all_links"].add(actual_link)
                 self.data["links"].add(actual_link)
             else:
