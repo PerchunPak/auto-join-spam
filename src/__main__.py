@@ -41,11 +41,11 @@ async def loop(client: telethon.TelegramClient) -> None:
         try:
             await process.join_all_links(client, db.data["links"])
         except process.RateLimitError as error:
-            logger.warning(f"Got rate limited for {timedelta(seconds=error.sleep_for)}! Sleeping for next 20 minutes")
+            logger.warning(f"Got rate limited for {timedelta(seconds=error.sleep_for)}! Sleeping for next 15 minutes")
         else:
             await process.send_delayed_messages(db.data["delayed_messages"])
 
-        await asyncio.sleep(20 * 60)
+        await asyncio.sleep(15 * 60)
 
 
 if __name__ == "__main__":
