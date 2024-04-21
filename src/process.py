@@ -1,5 +1,6 @@
 import telethon
 from loguru import logger
+
 from src.db import Database
 
 
@@ -16,11 +17,7 @@ async def join_all_links(client: telethon.TelegramClient, links: set[str]) -> No
         logger.info("Joining {}...", link)
 
         try:
-            result = await client(
-                telethon.functions.messages.ImportChatInviteRequest(
-                    hash=link.removeprefix("+")
-                )
-            )
+            result = await client(telethon.functions.messages.ImportChatInviteRequest(hash=link.removeprefix("+")))
 
         except telethon.errors.InviteRequestSentError:
             db.mark_link_as_joined(link)
@@ -28,7 +25,7 @@ async def join_all_links(client: telethon.TelegramClient, links: set[str]) -> No
 
         except telethon.errors.UserAlreadyParticipantError:
             db.mark_link_as_joined(link)
-            logger.success(f"Apparently, we already joined {link}")
+            logger.warning(f"Apparently, we already joined {link}")
 
         except telethon.errors.FloodWaitError as error:
             raise RateLimitError(sleep_for=error.seconds)
