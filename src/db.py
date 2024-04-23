@@ -36,7 +36,7 @@ class Database(metaclass=utils.Singleton):
         return result
 
     @staticmethod
-    def _sanitize_json(data: dict) -> DatabaseStructure:
+    def _sanitize_json(data: dict) -> DatabaseStructure:  # type: ignore[type-arg]
         result: DatabaseStructure = {
             "all_links": set(data["all_links"]),
             "links": set(data["links"]),
@@ -50,7 +50,7 @@ class Database(metaclass=utils.Singleton):
         return result
 
     @staticmethod
-    def _unsanitize_json(data: DatabaseStructure) -> dict:
+    def _unsanitize_json(data: DatabaseStructure) -> dict:  # type: ignore[type-arg]
         result = {
             "all_links": list(data["all_links"]),
             "links": list(data["links"]),
@@ -59,16 +59,23 @@ class Database(metaclass=utils.Singleton):
         }
 
         for key, value in data["delayed_messages"].items():
-            result["delayed_messages"][key] = list(value)
+            result["delayed_messages"][key] = list(value)  # type: ignore[index]
 
         return result
 
     def save(self) -> None:
         with self.DATABASE_PATH.open("w") as f:
-            json.dump(self._unsanitize_json(self.data), f, indent=2, ensure_ascii=False)
+            json.dump(
+                self._unsanitize_json(self.data),
+                f,
+                indent=2,
+                ensure_ascii=False,
+            )
 
     def add_links(self, links: set[str]) -> None:
-        old_lens = len(self.data["all_links"]), len(self.data["corrupted_links"])
+        old_lens = len(self.data["all_links"]), len(
+            self.data["corrupted_links"]
+        )
         for link in links:
             if actual_link := utils.validate_link(link):
                 if actual_link in self.data["all_links"]:
@@ -79,7 +86,9 @@ class Database(metaclass=utils.Singleton):
             else:
                 self.data["corrupted_links"].add(link)
 
-        new_lens = len(self.data["all_links"]), len(self.data["corrupted_links"])
+        new_lens = len(self.data["all_links"]), len(
+            self.data["corrupted_links"]
+        )
         difference_lens = new_lens[0] - old_lens[0], new_lens[1] - old_lens[1]
         if any(difference_lens):
             msg = "Added "

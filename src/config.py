@@ -55,7 +55,9 @@ class Config(metaclass=utils.Singleton):
     apykuma: ApykumaConfigSection = dataclasses.field(
         default_factory=ApykumaConfigSection
     )
-    sentry: SentryConfigSection = dataclasses.field(default_factory=SentryConfigSection)
+    sentry: SentryConfigSection = dataclasses.field(
+        default_factory=SentryConfigSection
+    )
     logging: LoggingSection = dataclasses.field(default_factory=LoggingSection)
 
     @classmethod

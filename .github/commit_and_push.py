@@ -7,6 +7,7 @@ when you're committing with API, there will be *verified* label.
     This will actually run ``git add .`` and ``git pull`` in the end,
     so consider **do not run** this, if you will not debug it.
 """
+
 import argparse
 import base64
 import dataclasses
@@ -69,9 +70,13 @@ class FileDeletion:
 class FileChanges:
     """Represents `FileChanges https://docs.github.com/en/graphql/reference/input-objects#filechanges`_ object."""
 
-    additions: typing.List[FileAddition] = dataclasses.field(default_factory=list)
+    additions: typing.List[FileAddition] = dataclasses.field(
+        default_factory=list
+    )
     """List of additions in future commit."""
-    deletions: typing.List[FileDeletion] = dataclasses.field(default_factory=list)
+    deletions: typing.List[FileDeletion] = dataclasses.field(
+        default_factory=list
+    )
     """List of deletions in future commit."""
 
     def merge(self, other: "FileChanges") -> "FileChanges":
@@ -125,7 +130,11 @@ class NewFile:
             :class:`.FileChanges` object.
         """
         return FileChanges(
-            additions=[FileAddition(path=self.path, contents=_calculate_file_content(self.path))],
+            additions=[
+                FileAddition(
+                    path=self.path, contents=_calculate_file_content(self.path)
+                )
+            ],
         )
 
 
@@ -164,7 +173,12 @@ class RenamedFile:
             :class:`.FileChanges` object.
         """
         return FileChanges(
-            additions=[FileAddition(path=self.new_path, contents=_calculate_file_content(self.new_path))],
+            additions=[
+                FileAddition(
+                    path=self.new_path,
+                    contents=_calculate_file_content(self.new_path),
+                )
+            ],
             deletions=[FileDeletion(path=self.old_path)],
         )
 
@@ -201,15 +215,23 @@ def calculate_file_changes(diff: git.diff.DiffIndex) -> FileChanges:
     file_changes = FileChanges()
     for changed in diff:
         if changed.change_type == "A":
-            file_changes = file_changes.merge(NewFile(path=changed.a_path).to_file_changes())
+            file_changes = file_changes.merge(
+                NewFile(path=changed.a_path).to_file_changes()
+            )
         elif changed.change_type == "D":
-            file_changes = file_changes.merge(DeletedFile(path=changed.b_path).to_file_changes())
+            file_changes = file_changes.merge(
+                DeletedFile(path=changed.b_path).to_file_changes()
+            )
         elif changed.change_type == "R":
             file_changes = file_changes.merge(
-                RenamedFile(new_path=changed.b_path, old_path=changed.a_path).to_file_changes()
+                RenamedFile(
+                    new_path=changed.b_path, old_path=changed.a_path
+                ).to_file_changes()
             )
         elif changed.change_type == "M":
-            file_changes = file_changes.merge(ModifiedFile(path=changed.b_path).to_file_changes())
+            file_changes = file_changes.merge(
+                ModifiedFile(path=changed.b_path).to_file_changes()
+            )
         else:  # pragma: no cover
             # I don't really understand what is undocumented change types here.
             # Will implement it in the future, if I will find what is this.
@@ -223,7 +245,9 @@ def _git_pull() -> None:
     repo.remotes.origin.pull()
 
 
-def generate_request_data(args: argparse.Namespace, file_changes: FileChanges) -> typing.Tuple[tuple, dict]:
+def generate_request_data(
+    args: argparse.Namespace, file_changes: FileChanges
+) -> typing.Tuple[tuple, dict]:
     """Generate request data from arguments and :class:`.FileChanges` object.
 
     Args:
@@ -243,7 +267,10 @@ def generate_request_data(args: argparse.Namespace, file_changes: FileChanges) -
                 "query": "mutation ($input: CreateCommitOnBranchInput!) {createCommitOnBranch(input: $input) {commit {url}}}",
                 "variables": {
                     "input": {
-                        "branch": {"repositoryNameWithOwner": args.repository, "branchName": args.branch},
+                        "branch": {
+                            "repositoryNameWithOwner": args.repository,
+                            "branchName": args.branch,
+                        },
                         "message": {"headline": args.message},
                         "fileChanges": dataclasses.asdict(file_changes),
                         "expectedHeadOid": get_latest_commit(),
@@ -275,11 +302,14 @@ def send_http_request(args: tuple, kwargs: dict) -> typing.Iterable[dict]:
     response.raise_for_status()
     if "errors" in response.json():
         raise ValueError(
-            "Github raised error(s): \n" + "\n".join(error["message"] for error in response.json()["errors"])
+            "Github raised error(s): \n"
+            + "\n".join(error["message"] for error in response.json()["errors"])
         )
 
 
-def parse_args() -> argparse.Namespace:  # pragma: no cover # no sense to test it
+def parse_args() -> (
+    argparse.Namespace
+):  # pragma: no cover # no sense to test it
     """Parse arguments with :class:`argparse.ArgumentParser`.
 
     Returns:
@@ -329,7 +359,9 @@ def main() -> typing.Iterable[str]:
     if not file_changes:
         return "Nothing to commit."
 
-    for response in send_http_request(*generate_request_data(args, file_changes)):
+    for response in send_http_request(
+        *generate_request_data(args, file_changes)
+    ):
         yield f"\nResponse from GitHub: {response}"
 
     yield "\nPerforming `git pull`..."

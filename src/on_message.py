@@ -1,8 +1,9 @@
 import telethon.events
 import telethon.tl.types
 from loguru import logger
-from src.extract_data import extract_message
+
 from src.db import Database
+from src.extract_data import extract_message
 
 
 def register(client: telethon.TelegramClient) -> None:
@@ -22,14 +23,18 @@ async def on_message(event: telethon.events.NewMessage.Event) -> None:
         logger.debug("Got invalid message from {} (not a bot)", sender)
         return
 
-    elif not isinstance(sender, (telethon.tl.types.User, telethon.tl.types.Channel)):
+    elif not isinstance(
+        sender, (telethon.tl.types.User, telethon.tl.types.Channel)
+    ):
         logger.debug("Got invalid message from {} (not a bot/channel)", sender)
         return
 
     links_to_add, messages_to_add = await extract_message(event.message)
 
     displayed_name = (
-        sender.username if isinstance(sender, telethon.tl.types.User) else sender.title
+        sender.username
+        if isinstance(sender, telethon.tl.types.User)
+        else sender.title
     )
     logger.debug(
         f"New message from: {displayed_name} (links: {len(links_to_add)}; delayed messages: {len(messages_to_add)})"

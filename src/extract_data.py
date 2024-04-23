@@ -50,11 +50,15 @@ async def extract_data_from_unread_messages(
     return links, delayed_messages
 
 
-async def extract_message(message: telethon.types.Message) -> tuple[set[str], set[str]]:
+async def extract_message(
+    message: telethon.types.Message,
+) -> tuple[set[str], set[str]]:
     links: set[str] = set()
     messages_to_send: set[str] = set()
     if message.entities is not None:
-        links.update(extract_links_from_entities(message.message, message.entities))
+        links.update(
+            extract_links_from_entities(message.message, message.entities)
+        )
 
     if message.reply_markup is not None:
         messages_to_add, links_to_add = extract_links_from_reply_markup(

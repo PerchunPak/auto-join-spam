@@ -16,7 +16,9 @@ def main() -> None:
     config = Config()
     Database()
     logger.info("Starting app...")
-    with telethon.TelegramClient("data/bot", config.api_id, config.api_hash) as client:
+    with telethon.TelegramClient(
+        "data/bot", config.api_id, config.api_hash
+    ) as client:
         on_message.register(client)
         client.loop.run_until_complete(loop(client))
 
@@ -29,9 +31,14 @@ async def loop(client: telethon.TelegramClient) -> None:
 
     if len(db.data["all_links"]) == 0:
         logger.info("DB is empty, initializing it")
-        links, delayed_messages = await extract_data.extract_data_from_bots(client)
+        links, delayed_messages = await extract_data.extract_data_from_bots(
+            client
+        )
     else:
-        links, delayed_messages = await extract_data.extract_data_from_unread_messages(client)
+        (
+            links,
+            delayed_messages,
+        ) = await extract_data.extract_data_from_unread_messages(client)
 
     db.add_links(links)
     for to, messages in delayed_messages.items():
@@ -41,7 +48,9 @@ async def loop(client: telethon.TelegramClient) -> None:
         try:
             await process.join_all_links(client, db.data["links"])
         except process.RateLimitError as error:
-            logger.warning(f"Got rate limited for {timedelta(seconds=error.sleep_for)}! Sleeping for next 15 minutes")
+            logger.warning(
+                f"Got rate limited for {timedelta(seconds=error.sleep_for)}! Sleeping for next 15 minutes"
+            )
         else:
             await process.send_delayed_messages(db.data["delayed_messages"])
 
