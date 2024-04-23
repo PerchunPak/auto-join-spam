@@ -2,14 +2,13 @@
 
 import os
 import pathlib
+import re
 import sys
 import typing as t
 
 import apykuma
 import sentry_sdk
 from loguru import logger
-import re
-
 
 BASE_DIR = pathlib.Path(__file__).parent.parent
 DATA_DIR = pathlib.Path(os.environ.get("DATA_DIR", BASE_DIR / "data"))
@@ -35,7 +34,7 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-def validate_link(link: str) -> bool:
+def validate_link(link: str) -> t.Literal[False] | str:
     result = re.match(r".*(t\.me/)?(\+[\d\w_-]{16})$", link)
     if result:
         return result.group(2)
@@ -53,8 +52,7 @@ def setup_logging() -> None:
         logger.add(
             sys.stdout,
             level=config.logging.level,
-            filter=lambda record: record["level"].no
-            < config_module.LoggingLevel.WARNING,
+            filter=lambda record: record["level"].no < config_module.LoggingLevel.WARNING,
             colorize=True,
             serialize=config.logging.json,
             backtrace=True,

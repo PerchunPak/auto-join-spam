@@ -1,6 +1,8 @@
 import json
 import typing as t
 
+from loguru import logger
+
 from src import utils
 
 
@@ -66,6 +68,7 @@ class Database(metaclass=utils.Singleton):
             json.dump(self._unsanitize_json(self.data), f, indent=2, ensure_ascii=False)
 
     def add_links(self, links: set[str]) -> None:
+        old_lens = len(self.data["all_links"]), len(self.data["corrupted_links"])
         for link in links:
             if actual_link := utils.validate_link(link):
                 if actual_link in self.data["all_links"]:
@@ -75,6 +78,19 @@ class Database(metaclass=utils.Singleton):
                 self.data["links"].add(actual_link)
             else:
                 self.data["corrupted_links"].add(link)
+
+        new_lens = len(self.data["all_links"]), len(self.data["corrupted_links"])
+        difference_lens = new_lens[0] - old_lens[0], new_lens[1] - old_lens[1]
+        if any(difference_lens):
+            msg = "Added "
+            if difference_lens[0] and difference_lens[1]:
+                msg += f"new {difference_lens[0]} links and {difference_lens[1]} corrupted links"
+            elif difference_lens[0]:
+                msg += f"new {difference_lens[0]} links"
+            elif difference_lens[1]:
+                msg += f"new {difference_lens[1]} corrupted links"
+
+            logger.trace(msg)
 
         self.save()
 
