@@ -39,36 +39,11 @@ Most of those channels are news, there are some porn channels and many channels 
 
 ## Installing
 
-```bash
-git clone https://github.com/PerchunPak/auto-join-spam.git
-cd auto-join-spam
-```
-
-### Installing `poetry`
-
-Next we need install `poetry` with [recommended way](https://python-poetry.org/docs/master/#installation).
-
-If you use Linux, use command:
-
-```bash
-curl -sSL https://install.python-poetry.org | python -
-```
-
-If you use Windows, open PowerShell with admin privileges and use:
-
-```powershell
-(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
-```
-
-### Installing dependencies
-
-```bash
-poetry install --no-dev
-```
+https://hub.docker.com/r/perchunpak/auto-join-spam
 
 ### Configuration
 
-All configuration happens in `config.yml`, or with environment variables.
+All configuration happens in `/app/data/config.yml`.
 
 ### If something is not clear
 
