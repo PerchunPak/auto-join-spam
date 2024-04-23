@@ -1,6 +1,6 @@
 {
   "template": "/home/perchun/dev/python-template",
-  "commit": "25afc0824147df8bb1168d209d41de42efb58b98",
+  "commit": "73755a62202fa3ce203aeec2265b2f1500246b2f",
   "checkout": null,
   "context": {
     "cookiecutter": {
