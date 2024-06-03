@@ -21,7 +21,7 @@ loguru = "~0.7"
 sentry-sdk = "~2.3"
 apykuma = "~1"
 telethon = "^1.35.0"
-typing-extensions = "^4.11.0"
+typing-extensions = "^4.12.1"
 
 
 [tool.poetry.group.make.dependencies]
